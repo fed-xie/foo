@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Einstein&rsquo;s five-houses riddle</title>
+<style>
+body {
+	background-color:#E0E0E0;
+}
+ul li {
+	margin-bottom:1px;
+	width:600px;
+}
+</style>
+</head>
+<body>
+<div>
+	<h1>Einstein&apos;s riddle</h1>
+	<h2>The situation</h2>
+	<ol>
+	<li>There are 5 houses in five different colors.</li>
+	<li>In each house lives a person with a different nationality.</li>
+	<li>These five owners drink a certain type of beverage, smoke a certain brand  of cigar and keep a certain pet.</li>
+	<li>No owners have the same pet, smoke the same brand of cigar or drink the same beverage.</li>
+	</ol>
+	<p>The question is: <i>Who owns the fish?</i></p>
+	<h2>Hints</h2>
+	<ul id="hints">
+	<li>the <b>Brit</b> lives in the <b>red</b> house</li>
+	<li>the <b>Swede</b> keeps <b>dogs</b> as pets</li>
+	<li>the <b>Dane</b> drinks <b>tea</b></li>
+	<li>the <b>green</b> house is on the left of the <b>white</b> house and next to it</li>
+	<li>the <b>green</b> house's owner drinks <b>coffee</b></li>
+	<li>the person who smokes <b>Pall Mall</b> rears <b>birds</b></li>
+	<li>the owner of the <b>yellow</b> house smokes <b>Dunhill</b></li>
+	<li>the man living in the center house drinks <b>milk</b></li>
+	<li>the <b>Norwegian</b> lives in the first house</li>
+	<li>the man who smokes <b>Blend</b> lives next to the one who keeps <b>cats</b></li>
+	<li>the man who keeps <b>horses</b> lives next to the man who smokes <b>Dunhill</b></li>
+	<li>the owner who smokes <b>BlueMaster</b> drinks <b>beer</b></li>
+	<li>the <b>German</b> smokes <b>Prince</b></li>
+	<li>the <b>Norwegian</b> lives next to the <b>blue</b> house</li>
+	<li>the man who smokes <b>Blend</b> has a neighbor who drinks <b>water</b></li>
+	</ul>
+</div>
+<style>
+#street {
+	text-align:center;
+	width:510px;
+	float:left;
+	border:2px solid black;
+}
+#infoitems {
+	text-align:center;
+	float:left;
+	border:2px solid black;
+	margin-left:10px;
+}
+.house {
+	float:left;
+	width:90px;
+	margin:3px;
+	border-style:ridge;
+	text-align:center;
+}
+.house div {
+	height:60px;
+	text-align:center;
+	border-top:1px solid black;
+}
+.itembox {
+	display:inline-block;
+	width:90px;
+	height:50px;
+	border-style:outset;
+	margin:2px;
+	text-align:center;
+	cursor:pointer;
+}
+.cigar {background-color:brown;}
+.cigar p {color:white;}
+.pet {background-color:purple;}
+.pet p {color:yellow;}
+.beverage {background-color:lightblue;}
+.nationality {background-color:white;}
+</style>
+<div id="street">
+	<p>Street</p>
+</div>
+<div id="infoitems">
+	<p>Drag the information boxes into the right house.</p>
+</div>
+<script>
+var contents = {
+	color:["green", "blue", "white", "red", "yellow"],
+	pet:["Bird", "Cat", "Dog", "Horse", "Fish"],
+	cigar:["Pall Mall", "Prince", "Blend", "BlueMaster", "Dunhill"],
+	beverage:["Coffee", "Water", "Milk", "Beer", "Tea"],
+	nationality:["Norwegian", "German", "Swede", "Brit", "Dane"]
+};
+var si = {};
+function check_constraints() {
+	var hints = document.getElementById("hints");
+	var count;
+	count = 0;
+	function mark_hint(num, b) {
+		hints.children[num].style.backgroundColor = b ? "lightgreen" : "pink";
+		if (b) ++count;
+	}
+	function chkeq(num, v0, v1) { mark_hint(num, si[v0] && si[v0] == si[v1]); }
+	function chknb(num, v0, v1) {
+		if (si[v0] && si[v1])
+			mark_hint(num, -1 == si[v0]-si[v1] || 1 == si[v0]-si[v1]);
+		else
+			mark_hint(num, false);
+	}
+	chkeq(0, "Brit", "red");
+	chkeq(1, "Swede", "Dog");
+	chkeq(2, "Dane", "Tea");
+	mark_hint(3, si["green"] && si["white"] && -1 == si["green"] - si["white"]);
+	chkeq(4, "green", "Coffee");
+	chkeq(5, "Pall Mall", "Bird");
+	chkeq(6, "yellow", "Dunhill");
+	mark_hint(7, 2 == si["Milk"]);
+	mark_hint(8, 0 == si["Norwegian"]);
+	chknb(9, "Blend", "Cat");
+	chknb(10, "Horse", "Dunhill");
+	chkeq(11, "BlueMaster", "Beer");
+	chkeq(12, "German", "Prince");
+	chknb(13, "Norwegian", "blue");
+	chknb(14, "Blend", "Water");
+	if (15 == count)
+		confirm("Congratulations!");
+}
+function dragstart_item(evt) {
+	var type = evt.target.className.split(" ");
+	if (type.length > 1)
+		type = type[1];
+	else
+		throw "class length <= 1" + type;
+	evt.dataTransfer.setData("street_info", type + ";" + evt.target.textContent);
+}
+function drop_house(evt) {
+	evt.stopPropagation();
+	var msg = evt.dataTransfer.getData("street_info").split(";");
+	var type = msg[0];
+	var value = msg[1];
+	var pos = this.id.slice(5);
+
+	if ("color" == type) {
+		if (si[value] && si[value] != pos) {
+			var house = document.getElementById("House"+si[value]);
+			house.style.backgroundColor = null;
+			house.getElementsByTagName("p")[0].style.color = null;
+		}
+		var oldbgc = this.style.backgroundColor;
+		if (oldbgc)
+			si[oldbgc] = null;
+		this.style.backgroundColor = value;
+		this.getElementsByTagName("p")[0].style.color = "blue" == value ? "white" : "black";
+	}else {
+		if (si[value] && si[value] != pos) {
+			var house = document.getElementById("House"+si[value]);
+			var vdiv = house.getElementsByClassName(type)[0];
+			vdiv.innerHTML = "";
+		}
+		var vdiv = this.getElementsByClassName(type)[0];
+		if (vdiv.textContent)
+			si[vdiv.textContent] = null;
+		vdiv.innerHTML = "<p>" + value + "</p>";
+	}
+	si[value] = pos;
+	console.log(evt.type, msg, si[value]);
+	check_constraints();
+}
+!function () {
+	var street = document.getElementById("street");
+	for (var i=0; i<5; ++i) {
+		var house = document.createElement("div");
+		house.className = "house";
+		house.id = "House"+i;
+		house.innerHTML = "<p>" + "House"+(i+1) + "</p>";
+		for (type in contents) {
+			if ("color" == type)
+				continue;
+			var node = document.createElement("div");
+			node.className = type;
+			house.appendChild(node);
+		}
+		house.ondragover = function (ev) {ev.preventDefault();};
+		house.ondrop = drop_house;
+		
+		street.appendChild(house);
+	}
+	var infoitems = document.getElementById("infoitems");
+	for (type in contents) {
+		for (var i=0; i<contents[type].length; ++i) {
+			var value = contents[type][i];
+			si[value] = null;
+			
+			var idiv = document.createElement("div");
+			idiv.className = "itembox " + type;
+			if ("color" == type) {
+				idiv.style.backgroundColor = value;
+				idiv.style.color = value;
+			}
+			idiv.innerHTML = "<p>" + value + "</p>";
+			
+			idiv.draggable = true;
+			idiv.ondragstart = dragstart_item;
+			
+			infoitems.appendChild(idiv);
+		}
+		infoitems.appendChild(document.createElement("br"));
+	}
+}();
+</script>
+</body>
+</html>
