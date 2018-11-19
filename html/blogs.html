@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Blogs frame</title>
+<link rel="stylesheet" type="text/css" href="g.css"/>
+<script>
+function getBlogSummaries() {
+	var http_req = new XMLHttpRequest();
+	http_req.onreadystatechange = function () {
+		if (http_req.readyState==4 && http_req.status==200)
+			document.getElementById("main_col").innerHTML='<div class="blogsum">' + http_req.responseText + '</div>';
+		else
+			document.getElementById("main_col").innerHTML='<div class="blogsum"><p>Pull blog list failed.</p></div>';
+	}
+	http_req.open("GET", "blogSums", true);
+	http_req.send();
+}
+</script>
+</head>
+<body onload="getBlogSummaries()">
+<nav>
+	<ul>
+		<li><a href="index.html">~</a></li>
+		<li><a href="about.html">About</a></li>
+	</ul>
+</nav>
+<div id="main">
+	<div id="main_col" class="col main_col">
+		<div class="blogsum">
+			<h1>Blog title</h1>
+			<hr/>
+			<p>Blog content.</p>
+		</div>
+		<div class="blogsum">
+			<h1>Blog title</h1>
+			<p>Blog content.</p>
+		</div>
+	</div>
+	<div id="idx_col" class="col idx_col">
+		<ul>
+			<li><a href="javascript:void(0)">Test index0</a></li>
+			<li><a href="javascript:void(0)">Test index1</a></li>
+		</ul>
+	</div>
+	<div id="fix_btn">
+		<a href="javascript:void(0)" title="To top"><b>Top</b></a>
+		<a href="javascript:void(0)" title="blank"><b>Blank</b></a>
+	</div>
+</div>
+<footer>
+	<p><script>document.write(Date());</script></p>
+</footer>
+</body>
+</html>
