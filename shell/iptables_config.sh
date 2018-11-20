@@ -7,6 +7,9 @@ read -p "Before config iptables, do you need to backup your old configure? [yes|
 case $yn in
 	y|yes)
 		printf "Backup files to './backup'\n"
+		if [ ! -d ".backup" ]; then
+			mkdir backup
+		fi
 		iptables-save > backup/iptables.rules.backup
 		ip6tables-seve > backup/ip6tables.rules.backup
 		;;
@@ -51,8 +54,8 @@ chmod +x /etc/network/if-pre-up.d/ip6tables
 read -p "Apply now? [yes/no]" yn
 case $yn in
 	y|yes)
-		echo "$iptables_rules" > iptables-restore
-		echo "$ip6tables_rules" > ip6tables-restore
+		iptables-restore < /etc/iptables.rules
+		ip6tables-restore < /etc/ip6tables.rules
 		;;
 	*)
 		;;
