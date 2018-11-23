@@ -3,15 +3,39 @@ if [ `whoami` != "root" ]; then
 	echo "You need to switch to root"
 	exit 1
 fi
+
+#restore backup
+if [[ 1 == $# && "restore" == $1 ]]; then
+	if [ ! -d "./backup" ]; then
+		printf "./backup directory not exist\n"
+		exit 1
+	fi
+	cd backup
+	if [ -e "./iptables.rules.backup" ]; then
+		mv ./iptables.rules.backup /etc/iptables.rules
+	fi
+	if [ -e "./ip6tables.rules.backup" ]; then
+		mv ./ip6tables.rules.backup /etc/ip6tables.rules
+	fi
+	read -p "Apply now? [yes|no]" yn
+	if [[ $yn == "yes" || $yn == "y" ]]; then
+		iptables-restore < /etc/iptables.rules
+		ip6tables-restore < /etc/ip6tables.rules
+	fi
+	cd ..
+	exit 0
+fi
+
+#backup and set iptables
 read -p "Before config iptables, do you need to backup your old configure? [yes|no]" yn
 case $yn in
 	y|yes)
 		printf "Backup files to './backup'\n"
-		if [ ! -d ".backup" ]; then
+		if [ ! -d "./backup/" ]; then
 			mkdir backup
 		fi
-		iptables-save > backup/iptables.rules.backup
-		ip6tables-seve > backup/ip6tables.rules.backup
+		iptables-save > ./backup/iptables.rules.backup
+		ip6tables-save > ./backup/ip6tables.rules.backup
 		;;
 	*)
 		;;
